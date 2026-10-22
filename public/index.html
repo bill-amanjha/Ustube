@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f10">
+  <title>Ustube Queue</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    main { max-width: 640px; margin: 0 auto; padding: 16px 16px 80px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    header { display: flex; justify-content: space-between; align-items: center; }
+    .now { display: grid; gap: 10px; }
+    .now img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; background: #000; }
+    .now .title { font-weight: 700; font-size: 17px; }
+    .name-row label { white-space: nowrap; }
+    .results:not(:empty) { margin-top: 10px; max-height: 60vh; overflow: auto; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand"><span class="logo"></span>Ustube</div>
+      <span class="small muted"><span class="dot" id="status"></span><span id="status-text">Connecting…</span></span>
+    </header>
+
+    <section class="panel row name-row">
+      <label for="name" class="small muted">Your name</label>
+      <input id="name" class="field" maxlength="30" placeholder="So people know who added it">
+    </section>
+
+    <section class="panel" id="add"></section>
+
+    <section class="panel">
+      <h2 class="section-title">Now playing</h2>
+      <div id="now"></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="section-title">Up next <span id="count"></span></h2>
+      <div id="queue"></div>
+    </section>
+  </main>
+
+  <script src="/common.js"></script>
+  <script src="/add.js"></script>
+  <script>
+    const nameInput = document.getElementById('name');
+    try { nameInput.value = localStorage.getItem('ustube-name') || ''; } catch {}
+    nameInput.addEventListener('change', () => { try { localStorage.setItem('ustube-name', nameInput.value.trim()); } catch {} });
+    const myName = () => nameInput.value.trim();
+
+    mountAddBox(document.getElementById('add'), myName);
+
+    function render(state) {
+      const now = document.getElementById('now');
+      if (state.nowPlaying) {
+        const n = state.nowPlaying;
+        now.replaceChildren(el('div', { class: 'now' }, [
+          el('img', { src: `https://i.ytimg.com/vi/${n.videoId}/hqdefault.jpg`, alt: '' }),
+          el('div', {}, [
+            el('div', { class: 'title', text: n.title }),
+            el('div', { class: 'small muted', text: [n.author, `added by ${n.addedBy}`].filter(Boolean).join(' · ') }),
+          ]),
+        ]));
+      } else {
+        now.replaceChildren(el('div', { class: 'empty', text: 'Nothing playing. Add a song to start the party.' }));
+      }
+
+      document.getElementById('count').textContent = state.queue.length ? `(${state.queue.length})` : '';
+      const q = document.getElementById('queue');
+      if (!state.queue.length) return q.replaceChildren(el('div', { class: 'empty', text: 'Queue is empty.' }));
+      q.replaceChildren(...state.queue.map((item, i) => {
+        const mine = myName() && item.addedBy === myName();
+        const actions = mine ? [el('button', { class: 'btn icon', text: '✕', title: 'Remove', onclick: () => api('/api/remove', { id: item.id }) })] : [];
+        return trackRow(item, { sub: `${i + 1}. ${[item.author, `added by ${item.addedBy}`].filter(Boolean).join(' · ')}`, actions });
+      }));
+    }
+
+    subscribe(render, live => {
+      document.getElementById('status').classList.toggle('live', live);
+      document.getElementById('status-text').textContent = live ? 'Live' : 'Reconnecting…';
+    });
+  </script>
+</body>
+</html>
