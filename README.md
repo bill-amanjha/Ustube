@@ -46,3 +46,10 @@ The player is YouTube's own embedded player running in your browser, so it uses 
 - `public/player.html`: the player, for the computer connected to the speakers
 - `public/index.html`: the guest page
 - `public/add.js`, `public/common.js`, `public/style.css`: shared code and styles
+
+## Made by Aman Jha
+
+- Website: [amanjha.me](https://amanjha.me)
+- GitHub: [@bill-amanjha](https://github.com/bill-amanjha)
+- X: [@_amnjha](https://x.com/_amnjha)
+- LinkedIn: [amanjha01](https://www.linkedin.com/in/amanjha01/)

@@ -65,8 +65,41 @@ button, input { font: inherit; color: inherit; }
 .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
 .empty { color: var(--muted); padding: 18px 8px; text-align: center; }
 
+body { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+.dock {
+  position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px; padding: 6px 8px; z-index: 40;
+  background: rgba(30, 30, 34, .72); border: 1px solid rgba(255, 255, 255, .09); border-radius: 22px;
+  backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+.dock a { color: var(--text); text-decoration: none; }
+.dock-me { display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px; border-radius: 16px; }
+.dock-me:hover { background: rgba(255, 255, 255, .07); }
+.dock-me img { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); }
+.dock-me span { display: grid; line-height: 1.15; }
+.dock-me small { font-size: 11px; color: var(--muted); }
+.dock-me b { font-size: 14px; white-space: nowrap; }
+.dock-sep { width: 1px; height: 28px; background: rgba(255, 255, 255, .12); margin: 0 2px; }
+.dock-item {
+  position: relative; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px;
+  background: rgba(255, 255, 255, .06); transition: transform .18s ease, background .18s ease;
+}
+.dock-item:hover { transform: translateY(-6px) scale(1.18); background: var(--accent); }
+.dock-item::after {
+  content: attr(data-label); position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  background: #fff; color: #111; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s ease;
+}
+.dock-item:hover::after { opacity: 1; }
+@media (max-width: 359px) {
+  .dock-me span { display: none; }
+  .dock-me { padding-right: 4px; }
+}
+
 .toast {
-  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(120px);
+  position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(200px);
   background: #fff; color: #111; padding: 10px 18px; border-radius: 999px; font-weight: 600;
   transition: transform .25s ease; z-index: 50; max-width: calc(100% - 32px);
 }
